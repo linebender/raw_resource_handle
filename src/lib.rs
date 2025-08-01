@@ -16,6 +16,8 @@
 mod blob;
 mod font;
 mod image;
+#[cfg(feature = "bytemuck")]
+mod impl_bytemuck;
 
 pub use blob::{Blob, WeakBlob};
 pub use font::RawFontData;
