@@ -17,7 +17,7 @@ mod blob;
 mod font;
 
 pub use blob::{Blob, WeakBlob};
-pub use font::Font;
+pub use font::RawFontData;
 
 #[cfg(test)]
 mod tests {
