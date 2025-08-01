@@ -15,9 +15,11 @@
 
 mod blob;
 mod font;
+mod image;
 
 pub use blob::{Blob, WeakBlob};
 pub use font::RawFontData;
+pub use image::{ImageFormat, RawImageData};
 
 #[cfg(test)]
 mod tests {
