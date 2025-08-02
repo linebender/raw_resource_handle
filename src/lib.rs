@@ -1,4 +1,4 @@
-// Copyright 2024 the Raw Resource Handle Authors
+// Copyright 2025 the Raw Resource Handle Authors
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 //! # Raw Resource Handle
@@ -15,9 +15,13 @@
 
 mod blob;
 mod font;
+mod image;
+#[cfg(feature = "bytemuck")]
+mod impl_bytemuck;
 
 pub use blob::{Blob, WeakBlob};
-pub use font::Font;
+pub use font::RawFontData;
+pub use image::{ImageFormat, RawImageData};
 
 #[cfg(test)]
 mod tests {
