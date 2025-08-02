@@ -1,4 +1,4 @@
-// Copyright 2024 the Peniko Authors
+// Copyright 2025 the Raw Resource Handle Authors
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 #![allow(unsafe_code)] // reason = "unsafe is required for bytemuck unsafe impls"

@@ -1,4 +1,4 @@
-// Copyright 2022 the Raw Resource Handle Authors
+// Copyright 2025 the Raw Resource Handle Authors
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 use crate::Blob;
