@@ -21,8 +21,19 @@ targets = []
 [features]
 default = ["std"]
 std = []
+serde = ["dep:serde", "dep:serde_bytes"]
 
-[dependencies]
+[dependencies.serde]
+version = "1.0.219"
+optional = true
+default-features = false
+features = ["alloc", "derive"]
+
+[dependencies.serde_bytes]
+version = "0.11.17"
+optional = true
+default-features = false
+features = ["alloc"]
 
 [lints]
 rust.unsafe_code = "forbid"
