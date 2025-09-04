@@ -21,8 +21,12 @@ targets = []
 [features]
 default = ["std"]
 std = []
+# Adds serde Serialize and Deserialize impls for the Blob type
+serde = ["dep:serde", "dep:serde_bytes"]
 
 [dependencies]
+serde = { version = "1.0.219", optional = true, default-features = false, features = ["alloc", "derive"] }
+serde_bytes = { version = "0.11.17", optional = true, default-features = false, features = ["alloc"] }
 
 [lints]
 rust.unsafe_code = "forbid"
