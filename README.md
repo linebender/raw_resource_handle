@@ -18,7 +18,7 @@
 If you're using this repo as a template for new repositories, https://github.com/linebender/anymore/ is a better model. -->
 
 Linebender Resource Handle provides functionality for storing blobs of data and an associated ID.
-This primitive is adapted in Peniko to store images, but the `Font` type lives in this repository.
+This primitive is adapted in Peniko to store images, but the `FontData` type lives in this repository.
 This crate is designed to allow making semver incompatible releases of Parley and Vello, whilst allowing them to be cross-compatible.
 
 This crate is not intended for long-term use, and we expect our resource handling story to change.

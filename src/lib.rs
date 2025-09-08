@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 //! Linebender Resource Handle provides functionality for storing blobs of data and an associated ID.
-//! This primitive is adapted in Peniko to store images, but the `Font` type lives in this repository.
+//! This primitive is adapted in Peniko to store images, but the [`FontData`] type lives in this crate.
 //! This crate is designed to allow making semver incompatible releases of Parley and Vello, whilst allowing them to be cross-compatible.
 //!
 //! This crate is not intended for long-term use, and we expect our resource handling story to change.
