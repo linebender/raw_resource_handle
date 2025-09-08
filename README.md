@@ -2,7 +2,7 @@
 
 # Linebender Resource Handle
 
-**Shared handle for immutable fonts with dynamic lifetime**
+**Shared handle for immutable blobs with dynamic lifetime**
 
 [![Latest published version.](https://img.shields.io/crates/v/linebender_resource_handle.svg)](https://crates.io/crates/linebender_resource_handle)
 [![Documentation build status.](https://img.shields.io/docsrs/linebender_resource_handle.svg)](https://docs.rs/linebender_resource_handle)
