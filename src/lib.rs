@@ -1,7 +1,12 @@
 // Copyright 2024 the Raw Resource Handle Authors
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-//! # Raw Resource Handle
+//! Linebender Resource Handle provides functionality for storing blobs of data and an associated ID.
+//! This primitive is adapted in Peniko to store images, but the `Font` type lives in this repository.
+//! This crate is designed to allow making semver incompatible releases of Parley and Vello, whilst allowing them to be cross-compatible.
+//!
+//! This crate is not intended for long-term use, and we expect our resource handling story to change.
+//! That's the reason that this crate has the organisation name ("Linebender") in its crate name; we avoid squatting a more general name after we abandon it.
 
 // LINEBENDER LINT SET - lib.rs - v1
 // See https://linebender.org/wiki/canonical-lints/
