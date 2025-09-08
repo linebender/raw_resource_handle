@@ -18,6 +18,10 @@
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 #![no_std]
 
+#[cfg(feature = "std")]
+// Ensure that we don't compile if you're using the std feature on a platform without `std`
+extern crate std as _;
+
 mod blob;
 mod font;
 

@@ -21,8 +21,9 @@ targets = []
 
 [features]
 default = ["std"]
+# The `std` feature is provided for forwards compatibility only, and current behaviour is the same whether or not it is enabled.
 std = []
-# Adds serde Serialize and Deserialize impls for the Blob type
+# Adds serde Serialize and Deserialize impls for the Blob type.
 serde = ["dep:serde", "dep:serde_bytes"]
 
 [dependencies]
