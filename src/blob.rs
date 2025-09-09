@@ -99,9 +99,6 @@ impl<T> Blob<T> {
     /// Note that while this function is not unsafe, usage of this in combination
     /// with `new` (or with identifiers that are not uniquely associated with the given data)
     /// can lead to inconsistencies.
-    ///
-    /// This is primarily for libraries that wish to interop with vello but are
-    /// unable to depend on our resource types.
     pub fn from_raw_parts(data: Arc<dyn AsRef<[T]> + Send + Sync>, id: u64) -> Self {
         Self { data, id }
     }
