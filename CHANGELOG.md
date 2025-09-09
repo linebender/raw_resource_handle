@@ -8,14 +8,14 @@ Subheadings to categorize changes are `added, changed, deprecated, removed, fixe
 
 # Changelog
 
-Linebender Resource Handle is yet to be released.
+The latest published Linebender Resource Handle release is [0.1.0](#010-2025-09-09) which was released on 2025-09-09.
+You can find its changes [documented below](#010-2025-09-09).
 
-<!-- The latest published Linebender Resource Handle release is [0.0.1](#010-2025-09-XX) which was released on 2025-09-XX.
-You can find its changes [documented below](#010-2025-09-XX). -->
+## [Unreleased][]
 
-<!-- ## 0.1.0 (2025-09-XX) -->
+This release has an [MSRV][] of 1.70.
 
-## Unreleased
+## 0.1.0 (2025-09-09)
 
 This release has an [MSRV][] of 1.70.
 
@@ -29,6 +29,6 @@ This is the initial release.
 
 [#5]: https://github.com/linebender/raw_resource_handle/pull/5
 
-<!-- [Unreleased]: https://github.com/linebender/anymore/compare/v1.0.0...HEAD -->
+[Unreleased]: https://github.com/linebender/anymore/compare/v0.1.0...HEAD
 
 [MSRV]: README.md#minimum-supported-rust-version-msrv
