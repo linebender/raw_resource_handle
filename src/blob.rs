@@ -2,11 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 use core::fmt;
-use core::sync::atomic::{AtomicU64, Ordering};
+use core::sync::atomic::Ordering;
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::sync::{Arc, Weak};
 use alloc::vec::Vec;
+
+#[cfg(not(target_has_atomic = "64"))]
+use core::sync::atomic::AtomicU32 as AtomicCounter;
+#[cfg(target_has_atomic = "64")]
+use core::sync::atomic::AtomicU64 as AtomicCounter;
 
 /// Shared data with an associated unique identifier.
 pub struct Blob<T> {
@@ -82,7 +87,7 @@ where
     }
 }
 
-static ID_COUNTER: AtomicU64 = AtomicU64::new(0);
+static ID_COUNTER: AtomicCounter = AtomicCounter::new(0);
 
 impl<T> Blob<T> {
     /// Creates a new blob from the given data and generates a unique
@@ -90,7 +95,10 @@ impl<T> Blob<T> {
     pub fn new(data: Arc<dyn AsRef<[T]> + Send + Sync>) -> Self {
         Self {
             data,
-            id: ID_COUNTER.fetch_add(1, Ordering::Relaxed),
+            #[allow(clippy::useless_conversion)] // Conversion is not useless on 32-bit platforms and is harmless on 64-bit platforms
+            // Overflow: We expect running this code on 32-bit targets to be rare enough in practise that we don't handle overflow.
+            // Impossible on 64-bit as counter is only ever incremented by 1.
+            id: ID_COUNTER.fetch_add(1, Ordering::Relaxed).into(),
         }
     }
 
