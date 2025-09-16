@@ -21,7 +21,7 @@ This release has an [MSRV][] of 1.70.
 
 ### Fixes
 
-- Fix: support compilation on platforms without 64-bit atomics (32-bit platforms) ([#11][] by [@nicoburns][])
+- Allow compilation to targets without 64-bit atomics. ([#11][] by [@nicoburns][])
 
 ## 0.1.0 (2025-09-09)
 
