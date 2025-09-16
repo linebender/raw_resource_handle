@@ -19,7 +19,7 @@ This release has an [MSRV][] of 1.70.
 
 This release has an [MSRV][] of 1.70.
 
-### Fixes
+### Fixed
 
 - Allow compilation to targets without 64-bit atomics. ([#11][] by [@nicoburns][])
 
