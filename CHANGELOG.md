@@ -15,7 +15,7 @@ You can find its changes [documented below](#011-2025-09-16).
 
 This release has an [MSRV][] of 1.70.
 
-## [0.1.1] (2025-09-16)
+## [0.1.1][] (2025-09-16)
 
 This release has an [MSRV][] of 1.70.
 
