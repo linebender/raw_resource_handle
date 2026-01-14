@@ -8,7 +8,6 @@ extern crate alloc;
 use alloc::boxed::Box;
 use alloc::sync::{Arc, Weak};
 use alloc::vec::Vec;
-use stable_deref_trait::StableDeref;
 
 #[cfg(not(target_has_atomic = "64"))]
 use core::sync::atomic::AtomicU32 as AtomicCounter;
@@ -17,8 +16,14 @@ use core::sync::atomic::AtomicU64 as AtomicCounter;
 
 /// Marker trait for types that can be stored in a [`Blob`]. This is used to abstract over `Vec<T>`, `Box<[T]>`,
 /// `Arc<[T]>`, etc.
-pub trait BlobStorage<T>: Deref<Target = [T]> + Send + Sync + StableDeref {}
-impl<T, U> BlobStorage<T> for U where U: Deref<Target = [T]> + Send + Sync + StableDeref {}
+///
+/// Implementing this trait soundly requires that the `Deref` implementation returns the same address each time, as long
+/// as the storage has not been mutated in-between (once placed in a [`Blob`], it's impossible to mutate the backing
+/// store, so the address must be stable thereafter).
+pub unsafe trait BlobStorage<T>: Deref<Target = [T]> + Send + Sync {}
+unsafe impl<T: Send + Sync> BlobStorage<T> for Vec<T> {}
+unsafe impl<T: Send + Sync> BlobStorage<T> for Box<[T]> {}
+unsafe impl<T: Send + Sync> BlobStorage<T> for Arc<[T]> {}
 
 /// Shared data with an associated unique identifier.
 pub struct Blob<T> {
@@ -43,7 +48,7 @@ where
 impl<'de, T> serde::de::Deserialize<'de> for Blob<T>
 where
     T: serde::de::Deserialize<'de> + Sync + Send + 'static,
-    Box<[u8]>: Deref<Target = [T]>,
+    Box<[u8]>: BlobStorage<T>,
 {
     fn deserialize<D>(des: D) -> Result<Self, D::Error>
     where
@@ -102,6 +107,7 @@ impl<T> Deref for Blob<T> {
     }
 }
 
+#[cfg(feature = "stable_deref_trait")]
 unsafe impl<T> stable_deref_trait::StableDeref for Blob<T> {}
 
 static ID_COUNTER: AtomicCounter = AtomicCounter::new(0);
