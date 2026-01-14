@@ -14,6 +14,10 @@ use core::sync::atomic::AtomicU32 as AtomicCounter;
 #[cfg(target_has_atomic = "64")]
 use core::sync::atomic::AtomicU64 as AtomicCounter;
 
+#[expect(
+    unsafe_code,
+    reason = "We are defining an unsafe trait, which is not in and of itself an unsafe thing to do"
+)]
 /// Marker trait for types that can be stored in a [`Blob`]. This is used to abstract over `Vec<T>`, `Box<[T]>`,
 /// `Arc<[T]>`, etc.
 ///
@@ -22,8 +26,20 @@ use core::sync::atomic::AtomicU64 as AtomicCounter;
 /// as the storage has not been mutated in-between (once placed in a [`Blob`], it's impossible to mutate the backing
 /// store, so the address must be stable thereafter).
 pub unsafe trait BlobStorage<T>: Deref<Target = [T]> + Send + Sync {}
+#[expect(
+    unsafe_code,
+    reason = "The contents of a Vec<T> have a stable address, as long as the Vec<T> is not mutated"
+)]
 unsafe impl<T: Send + Sync> BlobStorage<T> for Vec<T> {}
+#[expect(
+    unsafe_code,
+    reason = "The contents of a Box<[T]> have a stable address"
+)]
 unsafe impl<T: Send + Sync> BlobStorage<T> for Box<[T]> {}
+#[expect(
+    unsafe_code,
+    reason = "The contents of an Arc<[T]> have a stable address"
+)]
 unsafe impl<T: Send + Sync> BlobStorage<T> for Arc<[T]> {}
 
 /// Shared data with an associated unique identifier.
@@ -109,6 +125,10 @@ impl<T> Deref for Blob<T> {
 }
 
 #[cfg(feature = "stable_deref_trait")]
+#[expect(
+    unsafe_code,
+    reason = "The BlobStorage<T> trait guarantees a stable address as long as the backing store's contents are not mutated, and we put the backing store in an `Arc`, making it impossible to mutate"
+)]
 unsafe impl<T> stable_deref_trait::StableDeref for Blob<T> {}
 
 static ID_COUNTER: AtomicCounter = AtomicCounter::new(0);
