@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 use core::fmt;
+use core::ops::Deref;
 use core::sync::atomic::Ordering;
 extern crate alloc;
 use alloc::boxed::Box;
@@ -86,6 +87,17 @@ where
         Self::new(Arc::new(boxed))
     }
 }
+
+impl<T> Deref for Blob<T> {
+    type Target = [T];
+
+    fn deref(&self) -> &Self::Target {
+        self.data()
+    }
+}
+
+#[cfg(feature = "stable_deref_trait")]
+unsafe impl<T> stable_deref_trait::StableDeref for Blob<T> {}
 
 static ID_COUNTER: AtomicCounter = AtomicCounter::new(0);
 
