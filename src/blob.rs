@@ -17,6 +17,7 @@ use core::sync::atomic::AtomicU64 as AtomicCounter;
 /// Marker trait for types that can be stored in a [`Blob`]. This is used to abstract over `Vec<T>`, `Box<[T]>`,
 /// `Arc<[T]>`, etc.
 ///
+/// # Safety
 /// Implementing this trait soundly requires that the `Deref` implementation returns the same address each time, as long
 /// as the storage has not been mutated in-between (once placed in a [`Blob`], it's impossible to mutate the backing
 /// store, so the address must be stable thereafter).
