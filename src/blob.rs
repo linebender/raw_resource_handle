@@ -19,7 +19,7 @@ use core::sync::atomic::AtomicU64 as AtomicCounter;
 ///
 /// # Safety
 ///
-/// Implementing this trait soundly requires that the `Deref` implementation returns the same address each time, as long
+/// Implementing this trait soundly requires that the `AsRef` implementation returns the same address each time, as long
 /// as the storage has not been mutated in-between (once placed in a [`Blob`], it's impossible to mutate the backing
 /// store, so the address must be stable thereafter).
 #[allow(unsafe_code)]
