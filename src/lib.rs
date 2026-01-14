@@ -27,7 +27,7 @@ extern crate std as _;
 mod blob;
 mod font;
 
-pub use blob::{Blob, WeakBlob};
+pub use blob::{Blob, BlobStorage, WeakBlob};
 pub use font::FontData;
 
 #[cfg(test)]

@@ -8,15 +8,21 @@ extern crate alloc;
 use alloc::boxed::Box;
 use alloc::sync::{Arc, Weak};
 use alloc::vec::Vec;
+use stable_deref_trait::StableDeref;
 
 #[cfg(not(target_has_atomic = "64"))]
 use core::sync::atomic::AtomicU32 as AtomicCounter;
 #[cfg(target_has_atomic = "64")]
 use core::sync::atomic::AtomicU64 as AtomicCounter;
 
+/// Marker trait for types that can be stored in a [`Blob`]. This is used to abstract over `Vec<T>`, `Box<[T]>`,
+/// `Arc<[T]>`, etc.
+pub trait BlobStorage<T>: Deref<Target = [T]> + Send + Sync + StableDeref {}
+impl<T, U> BlobStorage<T> for U where U: Deref<Target = [T]> + Send + Sync + StableDeref {}
+
 /// Shared data with an associated unique identifier.
 pub struct Blob<T> {
-    data: Arc<dyn AsRef<[T]> + Send + Sync>,
+    data: Arc<dyn BlobStorage<T>>,
     id: u64,
 }
 
@@ -37,7 +43,7 @@ where
 impl<'de, T> serde::de::Deserialize<'de> for Blob<T>
 where
     T: serde::de::Deserialize<'de> + Sync + Send + 'static,
-    Box<[u8]>: AsRef<[T]>,
+    Box<[u8]>: Deref<Target = [T]>,
 {
     fn deserialize<D>(des: D) -> Result<Self, D::Error>
     where
@@ -96,7 +102,6 @@ impl<T> Deref for Blob<T> {
     }
 }
 
-#[cfg(feature = "stable_deref_trait")]
 unsafe impl<T> stable_deref_trait::StableDeref for Blob<T> {}
 
 static ID_COUNTER: AtomicCounter = AtomicCounter::new(0);
@@ -104,7 +109,7 @@ static ID_COUNTER: AtomicCounter = AtomicCounter::new(0);
 impl<T> Blob<T> {
     /// Creates a new blob from the given data and generates a unique
     /// identifier.
-    pub fn new(data: Arc<dyn AsRef<[T]> + Send + Sync>) -> Self {
+    pub fn new(data: Arc<dyn BlobStorage<T>>) -> Self {
         Self {
             data,
             #[allow(clippy::useless_conversion)] // Conversion is not useless on 32-bit platforms and is harmless on 64-bit platforms
@@ -119,13 +124,13 @@ impl<T> Blob<T> {
     /// Note that while this function is not unsafe, usage of this in combination
     /// with `new` (or with identifiers that are not uniquely associated with the given data)
     /// can lead to inconsistencies.
-    pub fn from_raw_parts(data: Arc<dyn AsRef<[T]> + Send + Sync>, id: u64) -> Self {
+    pub fn from_raw_parts(data: Arc<dyn BlobStorage<T>>, id: u64) -> Self {
         Self { data, id }
     }
 
     /// Consumes self and returns the inner components of the blob.
     #[must_use]
-    pub fn into_raw_parts(self) -> (Arc<dyn AsRef<[T]> + Send + Sync>, u64) {
+    pub fn into_raw_parts(self) -> (Arc<dyn BlobStorage<T>>, u64) {
         (self.data, self.id)
     }
 
@@ -172,7 +177,7 @@ impl<T> Blob<T> {
 /// Weak reference to a shared [blob](Blob).
 #[derive(Debug)]
 pub struct WeakBlob<T> {
-    data: Weak<dyn AsRef<[T]> + Send + Sync>,
+    data: Weak<dyn BlobStorage<T>>,
     id: u64,
 }
 
