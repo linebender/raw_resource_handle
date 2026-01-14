@@ -18,16 +18,21 @@ use core::sync::atomic::AtomicU64 as AtomicCounter;
 /// `Arc<[T]>`, etc.
 ///
 /// # Safety
+///
 /// Implementing this trait soundly requires that the `Deref` implementation returns the same address each time, as long
 /// as the storage has not been mutated in-between (once placed in a [`Blob`], it's impossible to mutate the backing
 /// store, so the address must be stable thereafter).
 #[allow(unsafe_code)]
-pub unsafe trait BlobStorage<T>: Deref<Target = [T]> + Send + Sync {}
-#[allow(unsafe_code)] // The contents of a Vec<T> have a stable address, as long as the Vec<T> is not mutated
+pub unsafe trait BlobStorage<T>: AsRef<[T]> + Send + Sync {}
+// The contents of a Vec<T> have a stable address, as long as the Vec<T> is not mutated.
+#[allow(unsafe_code)]
 unsafe impl<T: Send + Sync> BlobStorage<T> for Vec<T> {}
-#[allow(unsafe_code)] // The contents of a Box<[T]> have a stable address
+// The contents of a Box<[T]> have a stable address. Technically, moving a `Box` may invalidate the pointer even if the
+// address doesn't change (https://github.com/rust-lang/rfcs/pull/3712), but we put it in an `Arc` so it's never moved.
+#[allow(unsafe_code)]
 unsafe impl<T: Send + Sync> BlobStorage<T> for Box<[T]> {}
-#[allow(unsafe_code)] // The contents of an Arc<[T]> have a stable address
+// The contents of an Arc<[T]> have a stable address.
+#[allow(unsafe_code)]
 unsafe impl<T: Send + Sync> BlobStorage<T> for Arc<[T]> {}
 
 /// Shared data with an associated unique identifier.
@@ -112,7 +117,7 @@ impl<T> Deref for Blob<T> {
     }
 }
 
-#[cfg(feature = "stable_deref_trait")]
+#[cfg(feature = "stable_deref_trait_v1")]
 // Safety:
 //
 // The BlobStorage<T> trait guarantees a stable address as long as the backing store's contents are not mutated, and we

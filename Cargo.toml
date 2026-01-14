@@ -28,7 +28,7 @@ std = []
 serde = ["dep:serde", "dep:serde_bytes"]
 # Implements the `StableDeref` trait for `Blob`, which can be used with crates like `yoke` to enable zero-copy
 # deserialization of data stored in the `Blob`.
-stable_deref_trait = ["dep:stable_deref_trait"]
+stable_deref_trait_v1 = ["dep:stable_deref_trait"]
 
 [dependencies]
 serde = { version = "1.0.219", optional = true, default-features = false, features = [
