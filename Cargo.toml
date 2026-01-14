@@ -38,9 +38,7 @@ serde = { version = "1.0.219", optional = true, default-features = false, featur
 serde_bytes = { version = "0.11.17", optional = true, default-features = false, features = [
     "alloc",
 ] }
-stable_deref_trait = { version = "1.2.1", optional = true, default-features = false, features = [
-    "alloc",
-] }
+stable_deref_trait = { version = "1.2.1", optional = true, default-features = false }
 
 [lints]
 rust.unsafe_code = "deny"
