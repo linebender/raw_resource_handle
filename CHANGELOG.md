@@ -16,7 +16,7 @@ You can find its changes [documented below](#011-2025-09-16).
 This release has an [MSRV][] of 1.70.
 
 ### Added
-- If the `stable_deref_trait_v1` feature is enabled, `Blob<T>` now implements `StableDeref` from the `stable_deref_trait` crate. This allows it to be used with crates like `yoke`, enabling zero-copy deserialization of data backed by a `Blob<T>`.([#14][] by [@valadaptive][])
+- If the `stable_deref_trait_v1` feature is enabled, `Blob<T>` now implements `StableDeref` from the `stable_deref_trait` crate. This allows it to be used with crates like `yoke`, enabling zero-copy deserialization of data backed by a `Blob<T>`. ([#14][] by [@valadaptive][])
 
 ### Changed
 
