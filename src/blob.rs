@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 use core::fmt;
+use core::ops::Deref;
 use core::sync::atomic::Ordering;
 extern crate alloc;
 use alloc::boxed::Box;
@@ -13,9 +14,30 @@ use core::sync::atomic::AtomicU32 as AtomicCounter;
 #[cfg(target_has_atomic = "64")]
 use core::sync::atomic::AtomicU64 as AtomicCounter;
 
+/// Marker trait for types that can be stored in a [`Blob`]. This is used to abstract over `Vec<T>`, `Box<[T]>`,
+/// `Arc<[T]>`, etc.
+///
+/// # Safety
+///
+/// Implementing this trait soundly requires that the `AsRef` implementation returns the same address each time, as long
+/// as the storage has not been mutated in-between (once placed in a [`Blob`], it's impossible to mutate the backing
+/// store, so the address must be stable thereafter).
+#[allow(unsafe_code)]
+pub unsafe trait BlobStorage<T>: AsRef<[T]> + Send + Sync {}
+// The contents of a Vec<T> have a stable address, as long as the Vec<T> is not mutated.
+#[allow(unsafe_code)]
+unsafe impl<T: Send + Sync> BlobStorage<T> for Vec<T> {}
+// The contents of a Box<[T]> have a stable address. Technically, moving a `Box` may invalidate the pointer even if the
+// address doesn't change (https://github.com/rust-lang/rfcs/pull/3712), but we put it in an `Arc` so it's never moved.
+#[allow(unsafe_code)]
+unsafe impl<T: Send + Sync> BlobStorage<T> for Box<[T]> {}
+// The contents of an Arc<[T]> have a stable address.
+#[allow(unsafe_code)]
+unsafe impl<T: Send + Sync> BlobStorage<T> for Arc<[T]> {}
+
 /// Shared data with an associated unique identifier.
 pub struct Blob<T> {
-    data: Arc<dyn AsRef<[T]> + Send + Sync>,
+    data: Arc<dyn BlobStorage<T>>,
     id: u64,
 }
 
@@ -36,7 +58,7 @@ where
 impl<'de, T> serde::de::Deserialize<'de> for Blob<T>
 where
     T: serde::de::Deserialize<'de> + Sync + Send + 'static,
-    Box<[u8]>: AsRef<[T]>,
+    Box<[u8]>: BlobStorage<T>,
 {
     fn deserialize<D>(des: D) -> Result<Self, D::Error>
     where
@@ -87,12 +109,28 @@ where
     }
 }
 
+impl<T> Deref for Blob<T> {
+    type Target = [T];
+
+    fn deref(&self) -> &Self::Target {
+        self.data()
+    }
+}
+
+#[cfg(feature = "stable_deref_trait_v1")]
+// Safety:
+//
+// The BlobStorage<T> trait guarantees a stable address as long as the backing store's contents are not mutated, and we
+// put the backing store in an `Arc`, making it impossible to mutate
+#[allow(unsafe_code)]
+unsafe impl<T> stable_deref_trait::StableDeref for Blob<T> {}
+
 static ID_COUNTER: AtomicCounter = AtomicCounter::new(0);
 
 impl<T> Blob<T> {
     /// Creates a new blob from the given data and generates a unique
     /// identifier.
-    pub fn new(data: Arc<dyn AsRef<[T]> + Send + Sync>) -> Self {
+    pub fn new(data: Arc<dyn BlobStorage<T>>) -> Self {
         Self {
             data,
             #[allow(clippy::useless_conversion)] // Conversion is not useless on 32-bit platforms and is harmless on 64-bit platforms
@@ -107,13 +145,13 @@ impl<T> Blob<T> {
     /// Note that while this function is not unsafe, usage of this in combination
     /// with `new` (or with identifiers that are not uniquely associated with the given data)
     /// can lead to inconsistencies.
-    pub fn from_raw_parts(data: Arc<dyn AsRef<[T]> + Send + Sync>, id: u64) -> Self {
+    pub fn from_raw_parts(data: Arc<dyn BlobStorage<T>>, id: u64) -> Self {
         Self { data, id }
     }
 
     /// Consumes self and returns the inner components of the blob.
     #[must_use]
-    pub fn into_raw_parts(self) -> (Arc<dyn AsRef<[T]> + Send + Sync>, u64) {
+    pub fn into_raw_parts(self) -> (Arc<dyn BlobStorage<T>>, u64) {
         (self.data, self.id)
     }
 
@@ -160,7 +198,7 @@ impl<T> Blob<T> {
 /// Weak reference to a shared [blob](Blob).
 #[derive(Debug)]
 pub struct WeakBlob<T> {
-    data: Weak<dyn AsRef<[T]> + Send + Sync>,
+    data: Weak<dyn BlobStorage<T>>,
     id: u64,
 }
 

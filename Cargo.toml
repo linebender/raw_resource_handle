@@ -26,6 +26,9 @@ default = ["std"]
 std = []
 # Adds serde Serialize and Deserialize impls for the Blob type.
 serde = ["dep:serde", "dep:serde_bytes"]
+# Implements the `StableDeref` trait for `Blob`, which can be used with crates like `yoke` to enable zero-copy
+# deserialization of data stored in the `Blob`.
+stable_deref_trait_v1 = ["dep:stable_deref_trait"]
 
 [dependencies]
 serde = { version = "1.0.219", optional = true, default-features = false, features = [
@@ -35,9 +38,10 @@ serde = { version = "1.0.219", optional = true, default-features = false, featur
 serde_bytes = { version = "0.11.17", optional = true, default-features = false, features = [
     "alloc",
 ] }
+stable_deref_trait = { version = "1.2.1", optional = true, default-features = false }
 
 [lints]
-rust.unsafe_code = "forbid"
+rust.unsafe_code = "deny"
 
 # LINEBENDER LINT SET - Cargo.toml - v6.1
 # See https://linebender.org/wiki/canonical-lints/
