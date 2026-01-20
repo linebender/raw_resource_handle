@@ -33,6 +33,16 @@ This crate is designed to allow making semver incompatible releases of Parley an
 This crate is not intended for long-term use, and we expect our resource handling story to change.
 That's the reason that this crate has the organisation name ("Linebender") in its crate name; we avoid squatting a more general name after we discontinue it.
 
+## Features
+
+The following crate [feature flags](https://doc.rust-lang.org/cargo/reference/features.html#dependency-features) are available:
+
+- `std` (enabled by default): Enable future features which require the standard library.
+  This feature is provided for forwards compatibility only, and current behaviour is the same whether or not it is enabled.
+- `serde`: Implement [`serde::Serialize`] and [`serde::Deserialize`] for the types in the crate.
+- `stable_deref_trait_v1`: Implements the [`StableDeref`](stable_deref_trait::StableDeref) trait for `Blob`, which can be
+  used with crates like `yoke` to enable zero-copy deserialization of data stored in the `Blob`.
+
 <!-- cargo-rdme end -->
 <!-- markdownlint-enable MD053 -->
 
