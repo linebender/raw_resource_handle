@@ -85,6 +85,14 @@ jobs:
       - name: check copyright headers
         run: bash .github/copyright.sh
 
+      - name: Install cargo-rdme
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-rdme@1.4.8
+
+      - name: Run cargo rdme (linebender_resource_handle)
+        run: cargo rdme --check --workspace-project=linebender_resource_handle
+
   clippy-stable:
     name: cargo clippy
     runs-on: ${{ matrix.os }}
