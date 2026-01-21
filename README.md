@@ -14,15 +14,37 @@
 
 </div>
 
-<!-- TODO: We should use cargo-rdme here, but don't solely out of expedience.
-If you're using this repo as a template for new repositories, https://github.com/linebender/anymore/ is a better model. -->
+<!-- We use cargo-rdme to update the README with the contents of lib.rs.
+To edit the following section, update it in lib.rs, then run:
+cargo rdme --workspace-project=masonry_core
+Full documentation at https://github.com/orium/cargo-rdme -->
+
+<!-- Intra-doc links used in lib.rs should be evaluated here.
+See https://linebender.org/blog/doc-include/ for related discussion. -->
+[`FontData`]: https://docs.rs/linebender_resource_handle/latest/linebender_resource_handle/struct.FontData.html
+
+<!-- markdownlint-disable MD053 -->
+<!-- cargo-rdme start -->
 
 Linebender Resource Handle provides functionality for storing blobs of data and an associated ID.
-This primitive is adapted in Peniko to store images, but the `FontData` type lives in this repository.
+This primitive is adapted in Peniko to store images, but the [`FontData`] type lives in this crate.
 This crate is designed to allow making semver incompatible releases of Parley and Vello, whilst allowing them to be cross-compatible.
 
 This crate is not intended for long-term use, and we expect our resource handling story to change.
-That's the reason that this crate has the organisation name ("Linebender") in its crate name; we avoid squatting a more general name after we abandon it.
+That's the reason that this crate has the organisation name ("Linebender") in its crate name; we avoid squatting a more general name after we discontinue it.
+
+## Features
+
+The following crate [feature flags](https://doc.rust-lang.org/cargo/reference/features.html#dependency-features) are available:
+
+- `std` (enabled by default): Enable future features which require the standard library.
+  This feature is provided for forwards compatibility only, and current behaviour is the same whether or not it is enabled.
+- `serde`: Implement [`serde::Serialize`] and [`serde::Deserialize`] for the types in the crate.
+- `stable_deref_trait_v1`: Implements the [`StableDeref`](stable_deref_trait::StableDeref) trait for `Blob`, which can be
+  used with crates like `yoke` to enable zero-copy deserialization of data stored in the `Blob`.
+
+<!-- cargo-rdme end -->
+<!-- markdownlint-enable MD053 -->
 
 ## Minimum supported Rust Version (MSRV)
 
