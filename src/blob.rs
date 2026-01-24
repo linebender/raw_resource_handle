@@ -177,8 +177,9 @@ impl<T> Blob<T> {
     /// # Guarantees for unsafe code
     ///
     /// For any given blob, this method will always return a reference pointing to the same memory.
-    /// That pointer remains valid for at least as long as this blob's lifetime (which in general
-    /// can be longer than the duration of the borrow).
+    /// Additionally, that pointer remains valid for at least as long as this blob's lifetime
+    /// (which in general can be longer than the duration of the borrow). This holds due to the
+    /// requirements on [`BlobStorage`].
     #[must_use]
     pub fn data(&self) -> &[T] {
         self.data.as_ref().as_ref()
