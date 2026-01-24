@@ -19,9 +19,14 @@ use core::sync::atomic::AtomicU64 as AtomicCounter;
 ///
 /// # Safety
 ///
-/// Implementing this trait soundly requires that the `AsRef` implementation returns the same address each time, as long
-/// as the storage has not been mutated in-between (once placed in a [`Blob`], it's impossible to mutate the backing
-/// store, so the address must be stable thereafter).
+/// Implementing this trait soundly requires that, for as long as the backing storage is not
+/// mutated nor moved, each call to `AsRef`:
+/// - results in a reference pointing to the same memory; and
+/// - that the result remains valid for the entire duration, i.e., not just for the lifetime of the
+///   borrow but for at least until such time the storage is mutated or moved.
+///
+/// In the context of [`Blob`]s, once storage is placed in it, it's impossible to get exclusive
+/// access to or move the backing storage for the lifetime of the [`Blob`].
 #[allow(unsafe_code)]
 pub unsafe trait BlobStorage<T>: AsRef<[T]> + Send + Sync {}
 // The contents of a Vec<T> have a stable address, as long as the Vec<T> is not mutated.
@@ -168,6 +173,13 @@ impl<T> Blob<T> {
     }
 
     /// Returns a reference to the underlying data.
+    ///
+    /// # Guarantees for unsafe code
+    ///
+    /// For any given blob, this method will always return a reference pointing to the same memory.
+    /// Additionally, that pointer remains valid for at least as long as this blob's lifetime
+    /// (which in general can be longer than the duration of the borrow). This holds due to the
+    /// requirements on the inner [`BlobStorage`].
     #[must_use]
     pub fn data(&self) -> &[T] {
         self.data.as_ref().as_ref()
