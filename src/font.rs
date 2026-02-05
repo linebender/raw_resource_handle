@@ -14,6 +14,7 @@ pub struct FontData {
 
 impl FontData {
     /// Creates a new font with the given data and collection index.
+    #[inline(always)]
     #[must_use]
     pub fn new(data: Blob<u8>, index: u32) -> Self {
         Self { data, index }
