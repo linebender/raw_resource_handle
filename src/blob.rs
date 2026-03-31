@@ -84,12 +84,14 @@ impl<T> fmt::Debug for Blob<T> {
 }
 
 impl<T> PartialEq for Blob<T> {
+    #[inline]
     fn eq(&self, other: &Self) -> bool {
         self.id == other.id
     }
 }
 
 impl<T> Clone for Blob<T> {
+    #[inline]
     fn clone(&self) -> Self {
         Self {
             data: Arc::clone(&self.data),
@@ -99,6 +101,7 @@ impl<T> Clone for Blob<T> {
 }
 
 impl<T> AsRef<[T]> for Blob<T> {
+    #[inline]
     fn as_ref(&self) -> &[T] {
         self.data()
     }
@@ -108,6 +111,7 @@ impl<T> From<Vec<T>> for Blob<T>
 where
     T: 'static + Send + Sync,
 {
+    #[inline]
     fn from(vec: Vec<T>) -> Self {
         let boxed: Box<[T]> = vec.into();
         Self::new(Arc::new(boxed))
@@ -117,6 +121,7 @@ where
 impl<T> Deref for Blob<T> {
     type Target = [T];
 
+    #[inline]
     fn deref(&self) -> &Self::Target {
         self.data()
     }
@@ -135,6 +140,7 @@ static ID_COUNTER: AtomicCounter = AtomicCounter::new(0);
 impl<T> Blob<T> {
     /// Creates a new blob from the given data and generates a unique
     /// identifier.
+    #[inline]
     pub fn new(data: Arc<dyn BlobStorage<T>>) -> Self {
         Self {
             data,
@@ -150,23 +156,27 @@ impl<T> Blob<T> {
     /// Note that while this function is not unsafe, usage of this in combination
     /// with `new` (or with identifiers that are not uniquely associated with the given data)
     /// can lead to inconsistencies.
+    #[inline(always)]
     pub fn from_raw_parts(data: Arc<dyn BlobStorage<T>>, id: u64) -> Self {
         Self { data, id }
     }
 
     /// Consumes self and returns the inner components of the blob.
+    #[inline(always)]
     #[must_use]
     pub fn into_raw_parts(self) -> (Arc<dyn BlobStorage<T>>, u64) {
         (self.data, self.id)
     }
 
     /// Returns the length of the data.
+    #[inline]
     #[must_use]
     pub fn len(&self) -> usize {
         self.data().len()
     }
 
     /// Returns true if the blob is empty.
+    #[inline]
     #[must_use]
     pub fn is_empty(&self) -> bool {
         self.len() == 0
@@ -180,24 +190,28 @@ impl<T> Blob<T> {
     /// Additionally, that pointer remains valid for at least as long as this blob's lifetime
     /// (which in general can be longer than the duration of the borrow). This holds due to the
     /// requirements on the inner [`BlobStorage`].
+    #[inline]
     #[must_use]
     pub fn data(&self) -> &[T] {
         self.data.as_ref().as_ref()
     }
 
     /// Returns the unique identifier associated with the data.
+    #[inline(always)]
     #[must_use]
     pub fn id(&self) -> u64 {
         self.id
     }
 
     /// Returns the number of existing strong pointers to this blob.
+    #[inline]
     #[must_use]
     pub fn strong_count(&self) -> usize {
         Arc::strong_count(&self.data)
     }
 
     /// Downgrades the shared blob to a weak reference.
+    #[inline]
     #[must_use]
     pub fn downgrade(&self) -> WeakBlob<T> {
         WeakBlob {
@@ -215,6 +229,7 @@ pub struct WeakBlob<T> {
 }
 
 impl<T> Clone for WeakBlob<T> {
+    #[inline]
     fn clone(&self) -> Self {
         Self {
             data: Weak::clone(&self.data),
@@ -225,6 +240,7 @@ impl<T> Clone for WeakBlob<T> {
 
 impl<T> WeakBlob<T> {
     /// Returns the unique identifier associated with the data.
+    #[inline(always)]
     #[must_use]
     pub fn id(&self) -> u64 {
         self.id
@@ -232,6 +248,7 @@ impl<T> WeakBlob<T> {
 
     /// Upgrades the weak reference. Returns `None` if the inner value has been
     /// dropped.
+    #[inline]
     #[must_use]
     pub fn upgrade(&self) -> Option<Blob<T>> {
         Some(Blob {
